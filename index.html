@@ -3,320 +3,38 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Hosting Premium Animado</title>
-<style>
-  :root {
-    --bg-color: #f0f2f5;
-    --text-color: #222;
-    --primary-color: #6e8efb;
-    --card-bg: #fff;
-    --btn-bg: #6e8efb;
-    --btn-hover: #ff6f61;
-    --shadow-light: 0 10px 20px rgba(0,0,0,0.05);
-    --shadow-dark: 0 15px 30px rgba(0,0,0,0.15);
-  }
-  [data-theme="dark"] {
-    --bg-color: #1e1e2f;
-    --text-color: #f5f5f5;
-    --card-bg: #2a2a3b;
-    --btn-bg: #a777e3;
-    --btn-hover: #ff8a71;
-    --shadow-light: 0 10px 20px rgba(0,0,0,0.2);
-    --shadow-dark: 0 15px 30px rgba(0,0,0,0.35);
-  }
-
-  * { margin:0; padding:0; box-sizing:border-box; font-family: 'Poppins', sans-serif; transition: background-color 0.5s ease, color 0.5s ease; }
-  body { background: var(--bg-color); color: var(--text-color); line-height:1.6; scroll-behavior:smooth; }
-
-  /* Navbar */
-  nav {
-    position: fixed; top:0; width:100%; display:flex; justify-content:space-between;
-    align-items:center; padding:1rem 2rem; background: rgba(255,255,255,0.8); backdrop-filter: blur(10px);
-    box-shadow:var(--shadow-light); z-index:1000; transition: background 0.5s, padding 0.3s;
-  }
-  nav.scrolled { background: rgba(255,255,255,1); box-shadow: var(--shadow-dark); }
-  [data-theme="dark"] nav.scrolled { background: rgba(42,42,59,1); }
-  .logo { font-size:1.5rem; font-weight:bold; color:var(--text-color); }
-  nav a { margin-left:1.5rem; text-decoration:none; color:var(--text-color); font-weight:500; transition: color 0.3s; }
-  nav a:hover { color: var(--btn-hover); }
-  .theme-toggle, .auth-btn { cursor:pointer; padding:0.5rem 1rem; border:none; border-radius:5px; background:var(--btn-bg); color:#fff; font-weight:bold; }
-  .auth-btn { margin-left: 1rem; }
-
-  /* Hero con parallax */
-  .hero {
-    display:flex; justify-content:center; align-items:center; text-align:center; height:100vh; padding-top:60px;
-    background: url('https://images.unsplash.com/photo-1522199710521-72d69614c702?auto=format&fit=crop&w=1950&q=80') no-repeat center center/cover;
-    color:#fff; position: relative; overflow: hidden;
-  }
-  .hero::after {
-    content:""; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:0;
-  }
-  .hero-content { position:relative; z-index:1; animation: fadeIn 2s cubic-bezier(0.2, 0.8, 0.2, 1); }
-  .hero h1 { font-size:3.5rem; margin-bottom:1rem; text-shadow: 2px 2px 8px rgba(0,0,0,0.3); }
-  .hero p { font-size:1.5rem; text-shadow: 1px 1px 5px rgba(0,0,0,0.2); }
-
-  @keyframes fadeIn { 0%{opacity:0; transform:translateY(30px);} 100%{opacity:1; transform:translateY(0);} }
-
-  section { padding:6rem 2rem; max-width:1200px; margin:auto; }
-  h2 { text-align:center; margin-bottom:2rem; font-size:2.8rem; }
-
-  .cards { display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:2.5rem; }
-  .card {
-    background: var(--card-bg); padding:2rem; border-radius:20px;
-    box-shadow:var(--shadow-light);
-    transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.6s, background 0.3s, opacity 0.6s;
-    opacity:0; transform: translateY(80px);
-  }
-  .card:hover {
-    transform: translateY(-10px) scale(1.03);
-    box-shadow:var(--shadow-dark);
-  }
-  .card.visible { opacity:1; transform:translateY(0); }
-  .card h3 { color: var(--primary-color); font-size:1.8rem; margin-bottom:0.5rem; }
-  .card p { margin-bottom:1rem; }
-
-  .btn {
-    display:inline-block; padding:0.9rem 2rem; border:none; border-radius:50px; font-weight:bold;
-    background:var(--btn-bg); color:#fff; cursor:pointer; transition: all 0.3s ease;
-    box-shadow:0 5px 15px rgba(0,0,0,0.2); text-decoration:none; text-align:center;
-  }
-  .btn:hover {
-    transform: scale(1.05) rotate(1deg);
-    box-shadow:0 8px 25px rgba(0,0,0,0.35);
-    background: var(--btn-hover);
-  }
-
-  footer { text-align:center; padding:3rem; background: var(--card-bg); margin-top:2rem; }
-
-  /* Panel de Control (Modal) */
-  .modal-overlay {
-    position:fixed; top:0; left:0; width:100%; height:100%;
-    background:rgba(0,0,0,0.7); display:flex; justify-content:center; align-items:center;
-    opacity:0; visibility:hidden; transition: opacity 0.5s ease; z-index:2000;
-  }
-  .modal-overlay.visible { opacity:1; visibility:visible; }
-  .modal-content {
-    background:var(--card-bg); padding:2rem; border-radius:15px;
-    box-shadow:var(--shadow-dark); width:90%; max-width:400px; transform: scale(0.8);
-    transition: transform 0.5s ease; position:relative;
-  }
-  .modal-overlay.visible .modal-content { transform:scale(1); }
-  .close-btn { position:absolute; top:1rem; right:1rem; font-size:1.5rem; font-weight:bold; cursor:pointer; color:var(--text-color); }
-  .modal-content h3 { text-align:center; margin-bottom:1.5rem; font-size:2rem; }
-  .modal-content input {
-    width:100%; padding:0.75rem; margin-bottom:1rem; border:1px solid #ccc;
-    border-radius:8px; font-size:1rem; background: var(--bg-color); color:var(--text-color);
-  }
-  .modal-content .btn { width:100%; margin-top:1rem; }
-  .modal-switch { text-align:center; margin-top:1rem; cursor:pointer; }
-  
-  @media(max-width:768px) {
-    .hero h1 { font-size:2.5rem; }
-    .hero p { font-size:1.3rem; }
-    nav { padding:1rem; }
-    nav a { margin-left:0.8rem; }
-    .logo { font-size:1.2rem; }
-  }
-</style>
+<title>HostPremium - Inicio</title>
+<link rel="stylesheet" href="style.css">
 </head>
-<body data-theme="light">
-
-<nav id="navbar">
-  <div class="logo"><strong>HostPremium</strong></div>
-  <div>
-    <a href="#inicio">Inicio</a>
-    <a href="#servicios">Servicios</a>
-    <a href="#contacto">Contacto</a>
-    <button class="auth-btn" id="authBtn">Iniciar Sesión</button>
-    <button class="theme-toggle" id="toggleTheme">🌙</button>
-  </div>
-</nav>
-
-<section class="hero" id="inicio">
-  <div class="hero-content" id="heroContent">
-    <h1>Hosting Premium</h1>
-    <p>La velocidad y seguridad que tu proyecto merece.</p>
-    <a href="#servicios" class="btn">Explorar Servicios</a>
-  </div>
-</section>
-
-<section id="servicios">
-  <h2>Nuestros Servicios</h2>
-  <div class="cards">
-    <div class="card">
-      <h3>Hosting Rápido</h3>
-      <p>Servidores ultrarrápidos con un 99.9% de uptime garantizado.</p>
-      <button class="btn">Más Info</button>
+<body data-theme="dark">
+  <nav id="navbar">
+    <div class="logo"><strong>HostPremium</strong></div>
+    <div>
+      <a href="index.html" class="active">Inicio</a>
+      <a href="servicios.html">Servicios</a>
+      <a href="contacto.html">Contacto</a>
+      <button class="theme-toggle" id="toggleTheme">⚪</button>
     </div>
-    <div class="card">
-      <h3>Seguridad Premium</h3>
-      <p>Protección completa contra ataques DDoS y malware con SSL gratuito.</p>
-      <button class="btn">Más Info</button>
+  </nav>
+
+  <section class="hero" id="inicio">
+    <div class="hero-content">
+      <h1 class="hero-title">HostPremium</h1>
+      <p>¡El hosting que necesitas, con un estilo único!</p>
+      <a href="servicios.html" class="btn">Explorar Servicios</a>
     </div>
-    <div class="card">
-      <h3>Soporte 24/7</h3>
-      <p>Asistencia técnica inmediata de expertos, disponible en cualquier momento.</p>
-      <button class="btn">Más Info</button>
-    </div>
-    <div class="card">
-      <h3>Escalabilidad</h3>
-      <p>Tu hosting crece contigo, sin interrupciones ni migraciones complejas.</p>
-      <button class="btn">Más Info</button>
-    </div>
-  </div>
-</section>
+  </section>
 
-<section id="contacto">
-  <h2>Contáctanos</h2>
-  <p style="text-align:center; max-width:600px; margin:auto; margin-bottom:1.5rem;">¿Tienes alguna pregunta? Estaremos encantados de ayudarte. Escríbenos a nuestro correo o utiliza el siguiente botón.</p>
-  <div style="text-align:center;">
-    <button class="btn">Enviar Mensaje</button>
-  </div>
-</section>
+  <section class="intro">
+    <h2>¿Por qué elegirnos?</h2>
+    <p>Somos líderes en soluciones de hosting con tecnología de punta y soporte excepcional. Nuestras soluciones están diseñadas para crecer contigo, ofreciendo la máxima fiabilidad y rendimiento en el mercado.</p>
+    <a href="servicios.html" class="btn">Descubre más</a>
+  </section>
 
-<footer>
-  &copy; 2025 HostPremium. Todos los derechos reservados.
-</footer>
+  <footer>
+    &copy; 2025 HostPremium. Todos los derechos reservados.
+  </footer>
 
-<div id="authModal" class="modal-overlay">
-  <div class="modal-content">
-    <span class="close-btn">&times;</span>
-    <h3 id="modalTitle">Iniciar Sesión</h3>
-    <form id="authForm">
-      <input type="email" id="email" placeholder="Correo electrónico" required>
-      <input type="password" id="password" placeholder="Contraseña" required>
-      <button type="submit" class="btn" id="formBtn">Iniciar Sesión</button>
-    </form>
-    <p class="modal-switch">¿No tienes cuenta? <strong id="switchText">Regístrate</strong></p>
-  </div>
-</div>
-
-<script>
-  // Toggle tema
-  const toggleBtn = document.getElementById('toggleTheme');
-  const body = document.body;
-  const logo = document.querySelector('.logo');
-  const nav = document.querySelector('nav');
-  
-  toggleBtn.addEventListener('click', () => {
-    if(body.getAttribute('data-theme') === 'light'){
-      body.setAttribute('data-theme','dark');
-      toggleBtn.textContent = '☀️';
-    } else {
-      body.setAttribute('data-theme','light');
-      toggleBtn.textContent = '🌙';
-    }
-  });
-
-  // Cards animadas al scroll
-  const cards = document.querySelectorAll('.card');
-  const observer = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-      if(entry.isIntersecting){
-        entry.target.classList.add('visible');
-        observer.unobserve(entry.target);
-      }
-    });
-  }, {threshold:0.2, rootMargin: '0px 0px -50px 0px'});
-  cards.forEach(card => observer.observe(card));
-
-  // Parallax hero + fade out efecto + navbar dinámico
-  const hero = document.querySelector('.hero');
-  const heroContent = document.getElementById('heroContent');
-  const navbar = document.getElementById('navbar');
-
-  window.addEventListener('scroll', () => {
-    let scrollY = window.scrollY;
-    
-    // Parallax
-    hero.style.backgroundPositionY = `${scrollY * 0.5}px`;
-    
-    // Fade out del contenido
-    const heroOpacity = Math.max(1 - scrollY / 500, 0);
-    heroContent.style.opacity = heroOpacity;
-    
-    // Navbar dinámico
-    if (scrollY > 50) {
-      navbar.classList.add('scrolled');
-    } else {
-      navbar.classList.remove('scrolled');
-    }
-  });
-
-  // Funcionalidad del Modal de Autenticación
-  const authBtn = document.getElementById('authBtn');
-  const authModal = document.getElementById('authModal');
-  const closeBtn = document.querySelector('.close-btn');
-  const authForm = document.getElementById('authForm');
-  const formBtn = document.getElementById('formBtn');
-  const modalTitle = document.getElementById('modalTitle');
-  const switchText = document.getElementById('switchText');
-  let isLogin = true;
-
-  authBtn.addEventListener('click', () => {
-    if (authBtn.textContent === 'Iniciar Sesión') {
-      authModal.classList.add('visible');
-      body.style.overflow = 'hidden'; // Evita scroll del body
-    } else {
-      // Simula el acceso al panel de control
-      alert('Accediendo al panel de control...');
-    }
-  });
-
-  closeBtn.addEventListener('click', () => {
-    authModal.classList.remove('visible');
-    body.style.overflow = '';
-  });
-
-  // Cierra el modal al hacer clic fuera del formulario
-  authModal.addEventListener('click', (e) => {
-    if (e.target === authModal) {
-      authModal.classList.remove('visible');
-      body.style.overflow = '';
-    }
-  });
-
-  // Cierra el modal con la tecla ESC
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && authModal.classList.contains('visible')) {
-      authModal.classList.remove('visible');
-      body.style.overflow = '';
-    }
-  });
-
-  switchText.addEventListener('click', () => {
-    isLogin = !isLogin;
-    modalTitle.textContent = isLogin ? 'Iniciar Sesión' : 'Registrarse';
-    switchText.textContent = isLogin ? 'Regístrate' : 'Inicia Sesión';
-    formBtn.textContent = isLogin ? 'Iniciar Sesión' : 'Registrarse';
-  });
-
-  authForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-    
-    if (email && password) {
-      if (isLogin) {
-        alert('Inicio de sesión exitoso. ¡Bienvenido!');
-        authBtn.textContent = 'Panel de Control';
-      } else {
-        alert('Registro exitoso. Ahora puedes iniciar sesión.');
-        isLogin = true;
-        modalTitle.textContent = 'Iniciar Sesión';
-        switchText.textContent = 'Regístrate';
-        formBtn.textContent = 'Iniciar Sesión';
-      }
-      authModal.classList.remove('visible');
-      body.style.overflow = '';
-      authForm.reset();
-    } else {
-      alert('Por favor, completa todos los campos.');
-    }
-  });
-
-</script>
-
+  <script src="script.js"></script>
 </body>
 </html>
-
