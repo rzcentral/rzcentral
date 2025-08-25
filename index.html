@@ -8,8 +8,21 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
+
+    <nav class="navbar">
+        <div class="container">
+            <a href="#" class="navbar-brand">Rz Central</a>
+            <ul class="navbar-menu">
+                <li><a href="#pilares">Pilares</a></li>
+                <li><a href="#equipo">Equipo</a></li>
+                <li><a href="#ayuda">Unirse</a></li>
+                <li><a href="#proyectos">Proyectos</a></li>
+            </ul>
+        </div>
+    </nav>
 
     <header class="header">
         <div class="container">
@@ -34,6 +47,29 @@
                     <div class="card fade-in">
                         <h3 class="card-title">Fomento del Conocimiento</h3>
                         <p class="card-text">Más allá del soporte, nuestra verdadera pasión es compartir conocimiento. Promovemos el pensamiento libre y crítico para que desarrolles habilidades, seas independiente y ayudes a los demás.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="equipo" class="section">
+            <div class="container">
+                <h2 class="section-title">Conoce a Nuestro Equipo</h2>
+                <div class="grid-container">
+                    <div class="team-card fade-in-team">
+                        <img src="https://via.placeholder.com/150" alt="Miembro 1" class="team-photo">
+                        <h4 class="team-name">Nombre del Miembro</h4>
+                        <p class="team-role">Líder Fundador</p>
+                    </div>
+                    <div class="team-card fade-in-team">
+                        <img src="https://via.placeholder.com/150" alt="Miembro 2" class="team-photo">
+                        <h4 class="team-name">Nombre del Miembro</h4>
+                        <p class="team-role">Asesor Senior</p>
+                    </div>
+                    <div class="team-card fade-in-team">
+                        <img src="https://via.placeholder.com/150" alt="Miembro 3" class="team-photo">
+                        <h4 class="team-name">Nombre del Miembro</h4>
+                        <p class="team-role">Especialista en Seguridad</p>
                     </div>
                 </div>
             </div>
@@ -66,5 +102,17 @@
         </div>
     </footer>
 
+    <div id="welcome-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h3 class="modal-title">¡Bienvenidos a Rz Central!</h3>
+            <p class="modal-text">Estamos encantados de que estés aquí. Descubre cómo podemos ayudarte a construir un espacio seguro y próspero.</p>
+            <a href="https://discord.com/invite/eSfkKc3JRn" class="btn primary-btn" target="_blank">Únete Ahora</a>
+        </div>
+    </div>
+
+    <button id="scroll-to-top" title="Volver arriba"><i class="fas fa-arrow-up"></i></button>
+
+    <script src="script.js"></script>
 </body>
 </html>
