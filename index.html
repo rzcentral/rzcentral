@@ -1,10 +1,159 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Mi Página</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hosting Animado</title>
+<style>
+  /* Variables para modos */
+  :root {
+    --bg-color: #f5f5f5;
+    --text-color: #222;
+    --primary-color: #6e8efb;
+    --card-bg: #fff;
+    --btn-bg: #6e8efb;
+    --btn-hover: #ff6f61;
+  }
+
+  [data-theme="dark"] {
+    --bg-color: #1e1e2f;
+    --text-color: #f5f5f5;
+    --card-bg: #2a2a3b;
+    --btn-bg: #a777e3;
+    --btn-hover: #ff8a71;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; font-family: 'Segoe UI', sans-serif; transition: 0.3s; }
+  body { background: var(--bg-color); color: var(--text-color); line-height:1.6; }
+
+  /* Navbar */
+  nav {
+    position: fixed; top:0; width:100%; display:flex; justify-content:space-between;
+    align-items:center; padding:1rem 2rem; background: var(--card-bg); box-shadow:0 5px 15px rgba(0,0,0,0.1); z-index:1000;
+  }
+  nav a { margin-left:1.5rem; text-decoration:none; color:var(--text-color); font-weight:500; }
+  nav a:hover { color: var(--btn-hover); }
+  .theme-toggle { cursor:pointer; padding:0.5rem 1rem; border:none; border-radius:5px; background:var(--btn-bg); color:#fff; font-weight:bold; }
+
+  /* Hero */
+  .hero {
+    display:flex; justify-content:center; align-items:center; text-align:center; height:100vh; padding-top:60px;
+    background: linear-gradient(135deg, #6e8efb, #a777e3);
+    color:#fff;
+    animation: fadeIn 1.5s ease-in-out;
+  }
+  .hero h1 { font-size:3rem; margin-bottom:1rem; }
+  .hero p { font-size:1.5rem; }
+
+  @keyframes fadeIn { 0%{opacity:0; transform:translateY(20px);} 100%{opacity:1; transform:translateY(0);} }
+
+  /* Secciones */
+  section { padding:4rem 2rem; max-width:1200px; margin:auto; }
+  h2 { text-align:center; margin-bottom:2rem; font-size:2.5rem; }
+
+  /* Cards */
+  .cards { display:grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap:2rem; }
+  .card {
+    background: var(--card-bg); padding:2rem; border-radius:15px;
+    box-shadow:0 10px 20px rgba(0,0,0,0.1);
+    transition: transform 0.3s, box-shadow 0.3s, background 0.3s;
+  }
+  .card:hover { transform: translateY(-10px); box-shadow: 0 15px 25px rgba(0,0,0,0.3); }
+
+  /* Botones animados */
+  .btn {
+    display:inline-block; padding:0.75rem 1.5rem; border:none; border-radius:50px; font-weight:bold;
+    background:var(--btn-bg); color:#fff; cursor:pointer; transition: all 0.3s;
+    box-shadow:0 5px 15px rgba(0,0,0,0.2);
+  }
+  .btn:hover {
+    transform: scale(1.1);
+    box-shadow:0 8px 25px rgba(0,0,0,0.35);
+    background: var(--btn-hover);
+  }
+
+  /* Footer */
+  footer { text-align:center; padding:2rem; background: var(--card-bg); margin-top:2rem; }
+
+  /* Responsivo */
+  @media(max-width:768px) {
+    .hero h1 { font-size:2.2rem; }
+    .hero p { font-size:1.2rem; }
+  }
+</style>
 </head>
-<body>
-  <h1>Hola, mundo desde GitHub Pages</h1>
+<body data-theme="light">
+
+<nav>
+  <div class="logo"><strong>HostAnimado</strong></div>
+  <div>
+    <a href="#inicio">Inicio</a>
+    <a href="#servicios">Servicios</a>
+    <a href="#contacto">Contacto</a>
+    <button class="theme-toggle" id="toggleTheme">🌙</button>
+  </div>
+</nav>
+
+<section class="hero" id="inicio">
+  <div>
+    <h1>Bienvenido a Hosting Animado</h1>
+    <p>Diseño moderno con animaciones y modo oscuro/día</p>
+    <button class="btn">Explorar Servicios</button>
+  </div>
+</section>
+
+<section id="servicios">
+  <h2>Nuestros Servicios</h2>
+  <div class="cards">
+    <div class="card">
+      <h3>Hosting Rápido</h3>
+      <p>Servidores ultrarrápidos con uptime garantizado.</p>
+      <button class="btn">Más Info</button>
+    </div>
+    <div class="card">
+      <h3>Seguridad Premium</h3>
+      <p>Protección completa contra ataques y malware.</p>
+      <button class="btn">Más Info</button>
+    </div>
+    <div class="card">
+      <h3>Soporte 24/7</h3>
+      <p>Asistencia inmediata en cualquier momento.</p>
+      <button class="btn">Más Info</button>
+    </div>
+    <div class="card">
+      <h3>Escalabilidad</h3>
+      <p>Tu hosting crece contigo sin problemas.</p>
+      <button class="btn">Más Info</button>
+    </div>
+  </div>
+</section>
+
+<section id="contacto">
+  <h2>Contacto</h2>
+  <p style="text-align:center;">Escríbenos a <strong>contacto@hostanimado.com</strong> para más información.</p>
+  <div style="text-align:center; margin-top:1rem;">
+    <button class="btn">Enviar Mensaje</button>
+  </div>
+</section>
+
+<footer>
+  &copy; 2025 HostAnimado. Todos los derechos reservados.
+</footer>
+
+<script>
+  const toggleBtn = document.getElementById('toggleTheme');
+  const body = document.body;
+
+  toggleBtn.addEventListener('click', () => {
+    if(body.getAttribute('data-theme') === 'light') {
+      body.setAttribute('data-theme','dark');
+      toggleBtn.textContent = '☀️';
+    } else {
+      body.setAttribute('data-theme','light');
+      toggleBtn.textContent = '🌙';
+    }
+  });
+</script>
+
 </body>
 </html>
