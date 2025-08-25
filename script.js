@@ -1,50 +1,63 @@
-// Toggle tema
-const toggleBtn = document.getElementById('toggleTheme');
-const body = document.body;
-toggleBtn.addEventListener('click', () => {
-  if (body.getAttribute('data-theme') === 'light') {
-    body.setAttribute('data-theme', 'dark');
-  } else {
-    body.setAttribute('data-theme', 'light');
-  }
+document.addEventListener('DOMContentLoaded', () => {
+
+    const currentPath = window.location.pathname;
+
+    // Lógica para el smooth scroll
+    if (currentPath.includes('index.html') || currentPath === '/' || currentPath === '/index.html') {
+        document.querySelectorAll('.navbar-menu a').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                const targetId = this.getAttribute('href');
+                if (targetId.startsWith('#')) {
+                    e.preventDefault();
+                    const targetSection = document.querySelector(targetId);
+                    if (targetSection) {
+                        window.scrollTo({
+                            top: targetSection.offsetTop - 80,
+                            behavior: 'smooth'
+                        });
+                    }
+                }
+            });
+        });
+    }
+
+    // Modal de bienvenida
+    const modal = document.getElementById('welcome-modal');
+    const closeBtn = document.querySelector('.close-btn');
+
+    // Muestra el modal solo en la página principal y si no se ha visitado
+    if ((currentPath.includes('index.html') || currentPath === '/' || currentPath === '/index.html') && !sessionStorage.getItem('visited')) {
+        modal.style.display = 'flex';
+        sessionStorage.setItem('visited', 'true');
+    }
+
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+
+        window.addEventListener('click', (event) => {
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+    }
+
+    // Botón "Scroll to Top"
+    const scrollToTopBtn = document.getElementById('scroll-to-top');
+
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 300) {
+            scrollToTopBtn.style.display = 'block';
+        } else {
+            scrollToTopBtn.style.display = 'none';
+        }
+    });
+
+    scrollToTopBtn.addEventListener('click', () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    });
 });
-
-// Animaciones de cards al scroll
-const cards = document.querySelectorAll('.card');
-const observer = new IntersectionObserver(entries => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      entry.target.classList.add('visible');
-      observer.unobserve(entry.target);
-    }
-  });
-}, {threshold: 0.2, rootMargin: '0px 0px -50px 0px'});
-cards.forEach(card => observer.observe(card));
-
-// Efectos de hero y navbar si la página tiene la clase 'hero'
-const hero = document.querySelector('.hero');
-if (hero) {
-  const heroContent = document.querySelector('.hero-content');
-  const navbar = document.getElementById('navbar');
-  const heroTitle = document.querySelector('.hero-title');
-
-  window.addEventListener('scroll', () => {
-    let scrollY = window.scrollY;
-    
-    // Parallax
-    hero.style.backgroundPositionY = `${scrollY * 0.5}px`;
-    
-    // Fade out y pop out del contenido
-    heroContent.style.opacity = Math.max(1 - scrollY / 500, 0);
-    heroContent.style.transform = `scale(${Math.max(1 - scrollY / 1000, 0.5)})`;
-    
-    // Animación de la navbar
-    if (scrollY > 50) {
-      navbar.style.background = 'var(--bg-color)';
-      navbar.style.boxShadow = '0 4px 0px 0px var(--border-color)';
-    } else {
-      navbar.style.background = 'var(--card-bg)';
-      navbar.style.boxShadow = '0 4px 0px 0px var(--border-color)';
-    }
-  });
-}
