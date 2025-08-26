@@ -1,7 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    // Lógica para el smooth scroll
     const currentPath = window.location.pathname.split('/').pop();
+
+    // Lógica para el smooth scroll
     if (currentPath === 'index.html' || currentPath === '') {
         document.querySelectorAll('.navbar-menu a').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
@@ -23,18 +24,22 @@ document.addEventListener('DOMContentLoaded', () => {
     // Modal de bienvenida
     const modal = document.getElementById('welcome-modal');
     const closeBtn = document.querySelector('.close-btn');
+
+    // Muestra el modal solo en la página principal y si no se ha visitado
     if ((currentPath === 'index.html' || currentPath === '') && !sessionStorage.getItem('visited')) {
         setTimeout(() => {
             if (modal) {
                 modal.style.display = 'flex';
                 sessionStorage.setItem('visited', 'true');
             }
-        }, 3500);
+        }, 3500); // Espera 3.5 segundos después de que la carga de la página se complete
     }
+
     if (closeBtn) {
         closeBtn.addEventListener('click', () => {
             modal.style.display = 'none';
         });
+
         window.addEventListener('click', (event) => {
             if (event.target === modal) {
                 modal.style.display = 'none';
@@ -52,6 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 scrollToTopBtn.style.display = 'none';
             }
         });
+    
         scrollToTopBtn.addEventListener('click', () => {
             window.scrollTo({
                 top: 0,
@@ -67,19 +73,20 @@ window.onload = function() {
     const loaderWrapper = document.getElementById('loader-wrapper');
     const pageContent = document.getElementById('page-content');
     
+    // Si la pantalla de carga y el contenido existen
     if (loaderWrapper && pageContent) {
-        // Establece el tiempo de carga simulado
+        // Espera un tiempo mínimo de 3 segundos para el efecto
         setTimeout(() => {
-            // Inicia la transición de opacidad del loader
-            loaderWrapper.style.opacity = '0'; 
-            // Espera a que el loader se desvanezca
+            loaderWrapper.style.opacity = '0'; // Comienza el desvanecimiento del loader
+            // Espera un poco para que el loader se desvanezca antes de ocultarlo
             setTimeout(() => {
                 loaderWrapper.style.display = 'none';
-                pageContent.style.display = 'block'; 
+                pageContent.style.display = 'block'; // Muestra el contenedor
+                // Agrega la clase 'visible' para iniciar la transición de opacidad del contenido
                 setTimeout(() => {
                     pageContent.classList.add('visible');
-                }, 50); // Pequeño retraso para asegurar la animación
-            }, 500); // Coincide con la duración de la transición en CSS
-        }, 3000); // 3 segundos de carga
+                }, 50); // Un pequeño retraso para asegurar que la transición funcione
+            }, 500); // Coincide con la transición de opacidad del loader
+        }, 3000);
     }
 };
