@@ -1,120 +1,138 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Definir la función de validación de la página principal
-    const isHomePage = () => ['/', '/index.html'].includes(window.location.pathname);
+  // === Utilidad: detectar si estamos en la home ===
+  const isHomePage = () => {
+    const p = window.location.pathname || '/';
+    return p === '/' || p === '' || p.endsWith('/index.html');
+  };
 
-    // Seleccionar elementos de manera más eficiente
-    const elements = {
-        navbarLinks: document.querySelectorAll('.navbar-menu a[href^="#"]'),
-        modal: document.getElementById('welcome-modal'),
-        closeModalBtn: document.querySelector('.close-btn'),
-        scrollToTopBtn: document.getElementById('scroll-to-top')
-    };
+  // === Elementos principales de la UI ===
+  const elements = {
+    navbarLinks: Array.from(document.querySelectorAll('.navbar-menu a[href^="#"]')),
+    modal: document.getElementById('welcome-modal'),
+    closeModalBtn: document.querySelector('.close-btn'),
+    scrollToTopBtn: document.getElementById('scroll-to-top')
+  };
 
-    // Lógica para la detección de VPN
-    // API pública y gratuita que no requiere key
-    const VPN_DETECTION_API_URL = 'http://ip-api.com/json/?fields=hosting,as';
+  // === API para detección VPN (IMPORTANTE: usar HTTPS si tu web es HTTPS) ===
+  const VPN_DETECTION_API_URL = 'https://ip-api.com/json/?fields=hosting,as';
 
-    async function checkVPNAndLoadContent() {
-        try {
-            const response = await fetch(VPN_DETECTION_API_URL);
-            const data = await response.json();
+  async function checkVPNAndLoadContent() {
+    try {
+      // Timeout de 4s para no quedar colgado
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 4000);
 
-            // La API de ip-api.com tiene un campo 'hosting' que puede ser true para VPNs.
-            // También se puede verificar el campo 'as' (Autonomous System) para detectar centros de datos.
-            if (data.hosting === true || (data.as && data.as.includes('datacenter'))) {
-                // Bloquear la carga de la página y mostrar un mensaje
-                document.body.innerHTML = '<h1>Acceso Denegado</h1><p>Detectamos que estás usando una VPN o un proxy. Por favor, desactívalo para continuar.</p>';
-                document.body.style.display = 'flex';
-                document.body.style.flexDirection = 'column';
-                document.body.style.alignItems = 'center';
-                document.body.style.justifyContent = 'center';
-                document.body.style.height = '100vh';
-                return;
-            }
-        } catch (error) {
-            console.error('Error al verificar la VPN:', error);
-            // En caso de error, no bloqueamos al usuario para evitar falsos negativos
-        }
+      const response = await fetch(VPN_DETECTION_API_URL, { signal: controller.signal });
+      clearTimeout(timeoutId);
 
-        // Si no se detecta VPN, ejecutar el resto del código de la página
-        initializePageFeatures();
-    }
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const data = await response.json();
 
-    function initializePageFeatures() {
-        // Lógica para el smooth scroll
-        if (isHomePage()) {
-            elements.navbarLinks.forEach(link => {
-                link.addEventListener('click', e => {
-                    e.preventDefault();
-                    const targetId = link.getAttribute('href');
-                    const targetSection = document.querySelector(targetId);
-                    if (targetSection) {
-                        window.scrollTo({
-                            top: targetSection.offsetTop - 80,
-                            behavior: 'smooth'
-                        });
-                    }
-                });
-            });
-        }
-
-        // Lógica del modal de bienvenida
-        if (elements.modal && isHomePage() && !sessionStorage.getItem('visited')) {
-            elements.modal.style.display = 'flex';
-            sessionStorage.setItem('visited', 'true');
-        }
-
-        if (elements.closeModalBtn) {
-            elements.closeModalBtn.addEventListener('click', () => {
-                elements.modal.style.display = 'none';
-            });
-
-            elements.modal.addEventListener('click', e => {
-                if (e.target === elements.modal) {
-                    elements.modal.style.display = 'none';
-                }
-            });
-        }
-
-        // Lógica del botón "Scroll to Top"
-        if (elements.scrollToTopBtn) {
-            window.addEventListener('scroll', () => {
-                if (window.scrollY > 300) {
-                    elements.scrollToTopBtn.classList.add('is-visible');
-                } else {
-                    elements.scrollToTopBtn.classList.remove('is-visible');
-                }
-            });
-
-            elements.scrollToTopBtn.addEventListener('click', () => {
-                window.scrollTo({
-                    top: 0,
-                    behavior: 'smooth'
-                });
-            });
-        }
-
-        // Lógica de animaciones al hacer scroll (para las tarjetas, títulos, etc.)
-        const observerOptions = {
-            root: null,
-            rootMargin: '0px',
-            threshold: 0.1
-        };
-
-        const observer = new IntersectionObserver((entries, observer) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('is-visible');
-                    observer.unobserve(entry.target);
-                }
-            });
-        }, observerOptions);
-
-        document.querySelectorAll('.card, .team-card, .section-title').forEach(element => {
-            observer.observe(element);
+      const asField = data && data.as ? String(data.as).toLowerCase() : '';
+      if (data && (data.hosting === true || asField.includes('datacenter') || asField.includes('hosting'))) {
+        // Insertar overlay de bloqueo en vez de borrar el body
+        const overlay = document.createElement('div');
+        overlay.id = 'vpn-overlay';
+        Object.assign(overlay.style, {
+          position: 'fixed',
+          inset: '0',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          flexDirection: 'column',
+          background: '#fff',
+          zIndex: '99999',
+          padding: '1rem',
+          textAlign: 'center'
         });
+        overlay.innerHTML = `
+          <div>
+            <h1>Acceso denegado</h1>
+            <p>Detectamos que estás usando una VPN o proxy. Desactívalo para continuar.</p>
+          </div>`;
+        document.body.appendChild(overlay);
+        return;
+      }
+    } catch (error) {
+      console.warn('Error al verificar VPN (continuando):', error);
+      // En caso de error no bloqueamos al usuario
     }
 
-    // Iniciar la verificación de VPN y la carga del contenido
-    checkVPNAndLoadContent();
+    // Si no se detecta VPN → inicializar página
+    initializePageFeatures();
+  }
+
+  // === Utilidad: smooth scroll robusto ===
+  function smoothScrollToElement(el, offset = 80) {
+    const top = el.getBoundingClientRect().top + window.pageYOffset - offset;
+    window.scrollTo({ top, behavior: 'smooth' });
+  }
+
+  // === Inicializar las funcionalidades de la página ===
+  function initializePageFeatures() {
+    // Smooth scroll en la home
+    if (isHomePage() && elements.navbarLinks.length) {
+      elements.navbarLinks.forEach(link => {
+        link.addEventListener('click', e => {
+          const href = link.getAttribute('href') || '';
+          if (!href.startsWith('#') || href === '#') return;
+          e.preventDefault();
+          const id = href.slice(1);
+          const targetSection = id ? document.getElementById(id) : null;
+          if (targetSection) smoothScrollToElement(targetSection, 80);
+        });
+      });
+    }
+
+    // Modal de bienvenida (solo la primera visita en sesión)
+    if (elements.modal && isHomePage() && !sessionStorage.getItem('visited')) {
+      elements.modal.style.display = 'flex';
+      sessionStorage.setItem('visited', 'true');
+    }
+
+    // Eventos del modal (cerrar por botón o click fuera)
+    if (elements.modal) {
+      if (elements.closeModalBtn) {
+        elements.closeModalBtn.addEventListener('click', () => {
+          elements.modal.style.display = 'none';
+        });
+      }
+      elements.modal.addEventListener('click', e => {
+        if (e.target === elements.modal) {
+          elements.modal.style.display = 'none';
+        }
+      });
+    }
+
+    // Botón “scroll-to-top” con requestAnimationFrame
+    if (elements.scrollToTopBtn) {
+      let rafId = null;
+      window.addEventListener('scroll', () => {
+        if (rafId) cancelAnimationFrame(rafId);
+        rafId = requestAnimationFrame(() => {
+          elements.scrollToTopBtn.classList.toggle('is-visible', window.scrollY > 300);
+        });
+      });
+      elements.scrollToTopBtn.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    }
+
+    // Animaciones al hacer scroll (cards, títulos, etc.)
+    const observerOptions = { root: null, rootMargin: '0px', threshold: 0.1 };
+    const observer = new IntersectionObserver((entries, obs) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          obs.unobserve(entry.target);
+        }
+      });
+    }, observerOptions);
+
+    document.querySelectorAll('.card, .team-card, .section-title')
+      .forEach(el => observer.observe(el));
+  }
+
+  // === Arrancar proceso ===
+  checkVPNAndLoadContent();
 });
