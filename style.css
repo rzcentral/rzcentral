@@ -17,6 +17,7 @@ body {
     margin: 0;
     padding: 0;
     overflow-x: hidden;
+    scroll-behavior: smooth;
 }
 
 .container {
@@ -46,6 +47,7 @@ p { font-weight: 300; }
     padding: 15px 0;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
     transition: background-color 0.3s ease;
+    will-change: transform, background-color;
 }
 
 .navbar .container {
@@ -59,6 +61,11 @@ p { font-weight: 300; }
     font-weight: 700;
     color: var(--accent-color);
     text-decoration: none;
+    transition: transform 0.3s ease;
+}
+
+.navbar-brand:hover {
+    transform: scale(1.05) rotate(-2deg);
 }
 
 .navbar-menu {
@@ -76,34 +83,62 @@ p { font-weight: 300; }
     color: #ffffff;
     text-decoration: none;
     font-weight: 400;
-    transition: color 0.3s ease;
+    position: relative;
+    transition: color 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.navbar-menu a::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: var(--accent-color);
+    transition: width 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .navbar-menu a:hover {
     color: var(--accent-color);
 }
 
+.navbar-menu a:hover::after {
+    width: 100%;
+}
+
 /* Header */
 .header {
     text-align: center;
-    padding: 80px 0;
+    padding: 120px 0;
     background: linear-gradient(135deg, #1f1f1f, #121212);
     position: relative;
     overflow: hidden;
     animation: fadeIn 2s ease-in-out;
 }
 
-.header::before {
+.header::before, .header::after {
     content: '';
     position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
+    border-radius: 50%;
     background: radial-gradient(circle, var(--accent-color) 0%, transparent 70%);
-    opacity: 0.05;
-    animation: rotate 20s linear infinite;
+    opacity: 0.08;
     z-index: 0;
+}
+
+.header::before {
+    width: 150%;
+    height: 150%;
+    top: -20%;
+    left: -20%;
+    animation: rotate 25s linear infinite;
+}
+
+.header::after {
+    width: 120%;
+    height: 120%;
+    bottom: -10%;
+    right: -10%;
+    animation: rotate 30s linear infinite reverse;
 }
 
 .header .container {
@@ -120,6 +155,7 @@ p { font-weight: 300; }
     background: linear-gradient(45deg, var(--accent-color), #f7f7f7);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    animation: logo-pop 1.5s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
 }
 
 .slogan {
@@ -127,6 +163,7 @@ p { font-weight: 300; }
     margin: 20px auto 0;
     font-size: 1.1em;
     opacity: 0.9;
+    animation: fadeInSlideUp 1.5s 0.5s forwards;
 }
 
 /* Sections and Layout */
@@ -137,6 +174,14 @@ p { font-weight: 300; }
 .section-title {
     margin-bottom: 60px;
     position: relative;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+.section-title.is-visible {
+    opacity: 1;
+    transform: translateY(0);
 }
 
 .section-title::after {
@@ -147,6 +192,12 @@ p { font-weight: 300; }
     background-color: var(--accent-color);
     margin: 10px auto 0;
     border-radius: 2px;
+    transform: scaleX(0);
+    transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}
+
+.section-title.is-visible::after {
+    transform: scaleX(1);
 }
 
 .grid-container {
@@ -161,29 +212,53 @@ p { font-weight: 300; }
     border-radius: var(--border-radius);
     padding: 40px;
     box-shadow: 0 10px 20px var(--shadow-color);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.5s ease;
     border: 1px solid rgba(255, 255, 255, 0.05);
+    position: relative;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(20px);
+    will-change: transform, box-shadow;
+}
+
+.card.is-visible {
+    animation: fadeInSlideUp 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+.card:nth-child(1).is-visible { animation-delay: 0.2s; }
+.card:nth-child(2).is-visible { animation-delay: 0.4s; }
+.card:nth-child(3).is-visible { animation-delay: 0.6s; }
+
+.card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(207, 102, 121, 0.1) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    pointer-events: none;
 }
 
 .card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.6);
+    transform: translateY(-15px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+}
+
+.card:hover::before {
+    opacity: 1;
 }
 
 .card-title {
     color: var(--accent-color);
     margin-top: 0;
+    transition: color 0.3s ease;
 }
 
-.fade-in {
-    opacity: 0;
-    transform: translateY(20px);
-    animation: fadeInSlideUp 1s forwards;
+.card:hover .card-title {
+    color: #ffffff;
 }
-
-.card:nth-child(1) { animation-delay: 0.2s; }
-.card:nth-child(2) { animation-delay: 0.4s; }
-.card:nth-child(3) { animation-delay: 0.6s; }
 
 /* Team Cards */
 .team-card {
@@ -192,12 +267,23 @@ p { font-weight: 300; }
     padding: 30px;
     text-align: center;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-    transition: transform 0.3s ease, background-color 0.3s ease;
+    transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55), background-color 0.3s ease, box-shadow 0.5s ease;
+    opacity: 0;
+    transform: scale(0.9);
+    will-change: transform, box-shadow;
 }
 
+.team-card.is-visible {
+    animation: fadeInScale 1s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
+}
+.team-card:nth-child(1).is-visible { animation-delay: 0.2s; }
+.team-card:nth-child(2).is-visible { animation-delay: 0.4s; }
+.team-card:nth-child(3).is-visible { animation-delay: 0.6s; }
+
 .team-card:hover {
-    transform: translateY(-5px) scale(1.02);
+    transform: translateY(-8px) scale(1.03) rotate(-2deg);
     background-color: #222;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
 }
 
 .team-name {
@@ -212,16 +298,6 @@ p { font-weight: 300; }
     margin: 5px 0 0;
 }
 
-.fade-in-team {
-    opacity: 0;
-    transform: scale(0.95);
-    animation: fadeInScale 1s forwards;
-}
-.team-card:nth-child(1) { animation-delay: 0.2s; }
-.team-card:nth-child(2) { animation-delay: 0.4s; }
-.team-card:nth-child(3) { animation-delay: 0.6s; }
-
-
 /* Buttons */
 .btn-container {
     text-align: center;
@@ -235,13 +311,19 @@ p { font-weight: 300; }
     text-decoration: none;
     font-weight: 600;
     letter-spacing: 1px;
-    transition: transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+    transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55), background-color 0.3s ease, box-shadow 0.3s ease;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    will-change: transform, box-shadow;
 }
 
 .btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+}
+
+.btn:active {
+    transform: scale(0.95);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
 .primary-btn {
@@ -257,10 +339,29 @@ p { font-weight: 300; }
     background-color: transparent;
     border: 2px solid var(--accent-color);
     color: var(--accent-color);
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.secondary-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--accent-color);
+    transform: translateX(-100%);
+    transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+    z-index: -1;
+}
+
+.secondary-btn:hover::before {
+    transform: translateX(0);
 }
 
 .secondary-btn:hover {
-    background-color: var(--accent-color);
     color: #ffffff;
 }
 
@@ -295,7 +396,7 @@ p { font-weight: 300; }
     backdrop-filter: blur(5px);
     justify-content: center;
     align-items: center;
-    animation: fadeIn 0.5s ease;
+    animation: fadeIn 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .modal-content {
@@ -306,7 +407,7 @@ p { font-weight: 300; }
     max-width: 500px;
     position: relative;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-    animation: modalSlideIn 0.5s ease-out;
+    animation: modalSlideIn 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
 }
 
 .close-btn {
@@ -317,11 +418,12 @@ p { font-weight: 300; }
     font-size: 2em;
     font-weight: bold;
     cursor: pointer;
-    transition: color 0.3s ease;
+    transition: color 0.3s ease, transform 0.3s ease;
 }
 
 .close-btn:hover {
     color: var(--accent-color);
+    transform: rotate(90deg);
 }
 
 .modal-title {
@@ -353,12 +455,19 @@ p { font-weight: 300; }
     cursor: pointer;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
     transition: opacity 0.3s, transform 0.3s;
-    opacity: 0.8;
+    opacity: 0;
+    pointer-events: none;
+    will-change: transform, opacity;
+}
+
+#scroll-to-top.is-visible {
+    opacity: 1;
+    pointer-events: auto;
 }
 
 #scroll-to-top:hover {
+    transform: scale(1.1) rotate(15deg);
     opacity: 1;
-    transform: scale(1.1);
 }
 
 /* Animations */
@@ -368,12 +477,17 @@ p { font-weight: 300; }
 }
 
 @keyframes fadeInSlideUp {
-    from { opacity: 0; transform: translateY(20px); }
+    from { opacity: 0; transform: translateY(50px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes fadeInScale {
-    from { opacity: 0; transform: scale(0.95); }
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes logo-pop {
+    from { opacity: 0; transform: scale(0.8); }
     to { opacity: 1; transform: scale(1); }
 }
 
@@ -383,8 +497,8 @@ p { font-weight: 300; }
 }
 
 @keyframes modalSlideIn {
-    from { transform: translateY(-50px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
+    from { transform: translateY(-100px) scale(0.9); opacity: 0; }
+    to { transform: translateY(0) scale(1); opacity: 1; }
 }
 
 /* Responsive Design */
